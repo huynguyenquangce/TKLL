@@ -1,12 +1,20 @@
-import numpy as np
+# import numpy as np
+# import threading
 import cv2
 import pickle
-import pymongo
 from addDataToDatabase import Control
-from datetime import datetime
-from addDataToDatabase import Firebase
+import pyttsx3
+import numpy as np
+# from datetime import datetime
+# from addDataToDatabase import Firebase
 face_cascade = cv2.CascadeClassifier("./cascades/data/haarcascade_frontalface_alt2.xml")
-import os
+# import os
+# import requests
+
+
+#khởi tạo speakerqqqqq
+engine = pyttsx3.init()
+
 recognizer = cv2.face.LBPHFaceRecognizer_create()
 recognizer.read("trainner.yml")
 
@@ -22,13 +30,12 @@ def make_720p():
     cap.set(3, 1280)
     cap.set(4, 720)
 
-
-count_stranger = 50
+count_stranger = 30
 count_relative = 20
 temp_id = 0
 flag = 0
 person_name = ""
-
+check = np.full(shape=100,fill_value=False, dtype=bool)
 make_720p()
 while True:
     # Capture frame-by-frame
@@ -45,7 +52,7 @@ while True:
         if conf >= 45 and conf <= 85:
             # count_relative to recognize
             if temp_id != id_:
-                count_relative = 30
+                count_relative = 20
             temp_id = id_
             person_name = labels[id_]
             count_relative = count_relative - 1
@@ -56,12 +63,22 @@ while True:
             color = (255, 255, 255)
             stroke = 2
             cv2.putText(frame, person_name, (x, y), font, 1, color, stroke, cv2.LINE_AA)
+            fullname = Control.getNameById("",person_name)
+            if not check[temp_id]:
+                Control.addCheckin("", fullname,person_name)
+                check[temp_id]=True
+            else:
+                Control.addCheckout("",fullname,person_name)
+
 
             if count_relative == 0:
                 print("Successfully")
-                count_stranger = 50
+                count_stranger = 30
                 count_relative = 20
                 flag = 1
+                text = f"Hello{fullname}, good morning. Hope you have a good day."
+                engine.say(text)
+                engine.runAndWait()
                 break
         else:
             # Write person's name
@@ -70,13 +87,18 @@ while True:
             color = (255, 255, 255)
             stroke = 2
             cv2.putText(frame, name, (x, y), font, 1, color, stroke, cv2.LINE_AA)
+            #speaker
+
 
             count_stranger = count_stranger - 1
             if count_stranger == 0:
                 print("Who are you??")
-                count_stranger = 50
+                count_stranger = 30
                 count_relative = 20
                 flag = 2
+                text1 = f"Who are you?"
+                engine.say(text1)
+                engine.runAndWait()
                 break
         # # Draw a Rectangle
         color = (255, 0, 0)  # BGR 0 - 255
@@ -84,32 +106,58 @@ while True:
         end_cord_x = x + w  # Width of Rectangle
         end_cord_y = y + h  # Height of Recctangle
         cv2.rectangle(frame, (x, y), (end_cord_x, end_cord_y), color, stroke)
+    # so sánh thời gian làm việc của người trong công ty
     cv2.imshow("frame", frame)
+
     # nếu là người quen
     # Lấy đường dẫn tới thư mục chứa tệp Python đang chạy
-    current_directory = os.path.dirname(os.path.abspath(__file__))
-    img_directory = os.path.join(current_directory, "img")
-    if not os.path.exists(img_directory):
-        os.makedirs(img_directory)
-    if flag==1:
-        flag=0
-        #Create last photo into folder
-        img_item = (
-                os.path.join(img_directory, person_name)
-                + str(datetime.now().strftime("%Y%m%d%H%M%S"))
-                + ".png"
-        )
-        cv2.imwrite(img_item, frame)
+    # current_directory = os.path.dirname(os.path.abspath(__file__))
+    # img_directory = os.path.join(current_directory, "img")
+    # if not os.path.exists(img_directory):
+    #     os.makedirs(img_directory)
+    # if flag==1:
+    #     flag=0
+    #     #Create last photo into folder
+    #     img_item = (
+    #             os.path.join(img_directory, person_name)
+    #             + str(datetime.now().strftime("%Y%m%d%H%M%S"))
+    #             + ".png"
+    #     )
+    #     cv2.imwrite(img_item, frame)
+    # #add hoặc update history của người quen
+    #     imgURL = Control.getImageUrl("")
+    #     print(imgURL)
 
-    #add hoặc update history của người quen
-    imgURL = Control.getImageUrl("")
-    # print(imgURL)
-    # # Fname, Lname = Firebase.getNameById("",person_name)
-    # print(person_name)
-    # Control.addHistory("",imgURL, person_name, 0, True, True)
+        ############ Tải hết ảnh từ file img lên firebase ###############
 
+        ################
+    # Fname, Lname = Firebase.getNameById("",person_name)
+    #     print(person_name)
+    #     Control.addHistory("",imgURL, person_name, 0, True, True)
 
+    #trường hợp người lạ
+    # if flag==2:
+    #     flag=0
+    #     Control.addPerson("","undefined","undefined",)
+    #     img_item = (
+    #             os.path.join(img_directory, person_name)
+    #             + str(datetime.now().strftime("%Y%m%d%H%M%S"))
+    #             + ".png"
+    #     )
+    #     cv2.imwrite(img_item, frame)
+    #     # add hoặc update history của người quen
+    #     imgURL = Control.getImageUrl("")
+    #     print(imgURL)
+    #     # Fname, Lname = Firebase.getNameById("",person_name)
+    #     print(person_name)
+    #     Control.addHistory("", imgURL, person_name, 0, True, True)
     if cv2.waitKey(20) & 0xFF == ord("q"):
         break
+# Control.addImageToDatabase("")
+    #so sanh time
+timeCheckIn = Control.getTimeCheckIn("", person_name)
+timeCheckOut = Control.getTimeCheckOut("", person_name)
+Control.compareTime("", timeCheckOut, timeCheckIn, person_name)
+
 cap.release()
 cv2.destroyAllWindows()
