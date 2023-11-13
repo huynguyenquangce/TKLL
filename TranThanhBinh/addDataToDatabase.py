@@ -3,13 +3,16 @@ from firebase_admin import credentials
 from firebase_admin import db
 from firebase_admin import storage
 from datetime import datetime
-cred = credentials.Certificate("serviceAccountKey1.json")
+cred = credentials.Certificate("serviceAccountKey.json")
 # firebase_admin.initialize_app(cred,{
 #     'databaseURL':"https://faceattendancerealtime-8bc2f-default-rtdb.firebaseio.com/"
 # })
+# firebase_admin.initialize_app(cred,{
+#     'databaseURL':"https://datkll-781f0-default-rtdb.firebaseio.com/"
+# })
 firebase_admin.initialize_app(cred,{
-    'databaseURL':"https://datkll-781f0-default-rtdb.firebaseio.com/"
-})
+     'databaseURL':"https://fir-c20cd-default-rtdb.asia-southeast1.firebasedatabase.app/"
+ })
 import os
 import glob
 
@@ -74,7 +77,8 @@ class Control:
             "Name": Name,
             "Quequan": village,
             "createAt": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
-            "total_attendance":0
+            "total_attendance":0,
+            "attendance_processed": False
         }
         persons.child(idstudent).set(newPerson)
 
@@ -198,13 +202,21 @@ class Control:
         minutes, seconds = divmod(remainder, 60)
 
         print(f"{hours} giờ, {minutes} phút, {seconds} giây")
-        if (hours == 0 and minutes >= 1):
+        # if (hours == 0 and minutes ==0 and seconds >= 30):
+        #     temp['total_attendance'] += 1
+        #     # Cập nhật giá trị trong cơ sở dữ liệu
+        #     temp_ref.update({'total_attendance': temp['total_attendance']})
+        if hours == 0 and minutes == 0 and seconds >= 15 and not temp.get('attendance_processed', False):
             temp['total_attendance'] += 1
+            temp['attendance_processed'] = True  # Đặt biến flag thành True để đánh dấu là đã xử lý
             # Cập nhật giá trị trong cơ sở dữ liệu
-            temp_ref.update({'total_attendance': temp['total_attendance']})
+            temp_ref.update({'total_attendance': temp['total_attendance'], 'attendance_processed': True})
 
-
-
+    def resetCheck(self,id):
+        temp_ref = db.reference(f'person/{id}')
+        temp = temp_ref.get()
+        temp['attendance_processed'] = False
+        temp_ref.update({'attendance_processed': temp['attendance_processed']})
 
 
 

@@ -66,17 +66,21 @@ while True:
             fullname = Control.getNameById("",person_name)
             if not check[temp_id]:
                 Control.addCheckin("", fullname,person_name)
+                Control.resetCheck("", person_name)
                 check[temp_id]=True
             else:
                 Control.addCheckout("",fullname,person_name)
-
 
             if count_relative == 0:
                 print("Successfully")
                 count_stranger = 30
                 count_relative = 20
                 flag = 1
-                text = f"Hello{fullname}, good morning. Hope you have a good day."
+                # getTime checkIn + checkOut and compare
+                timeCheckIn = Control.getTimeCheckIn("", person_name)
+                timeCheckOut = Control.getTimeCheckOut("", person_name)
+                Control.compareTime("", timeCheckOut, timeCheckIn, person_name)
+                text = f"Hello{fullname}. Hope you have a good day."
                 engine.say(text)
                 engine.runAndWait()
                 break
@@ -106,7 +110,6 @@ while True:
         end_cord_x = x + w  # Width of Rectangle
         end_cord_y = y + h  # Height of Recctangle
         cv2.rectangle(frame, (x, y), (end_cord_x, end_cord_y), color, stroke)
-    # so sánh thời gian làm việc của người trong công ty
     cv2.imshow("frame", frame)
 
     # nếu là người quen
@@ -151,13 +154,8 @@ while True:
     #     # Fname, Lname = Firebase.getNameById("",person_name)
     #     print(person_name)
     #     Control.addHistory("", imgURL, person_name, 0, True, True)
+    # so sánh thời gian làm việc của người trong công ty
     if cv2.waitKey(20) & 0xFF == ord("q"):
         break
-# Control.addImageToDatabase("")
-    #so sanh time
-timeCheckIn = Control.getTimeCheckIn("", person_name)
-timeCheckOut = Control.getTimeCheckOut("", person_name)
-Control.compareTime("", timeCheckOut, timeCheckIn, person_name)
-
 cap.release()
 cv2.destroyAllWindows()
