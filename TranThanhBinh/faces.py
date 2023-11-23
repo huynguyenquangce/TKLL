@@ -80,6 +80,7 @@ while True:
                 timeCheckIn = Control.getTimeCheckIn("", person_name)
                 timeCheckOut = Control.getTimeCheckOut("", person_name)
                 Control.compareTime("", timeCheckOut, timeCheckIn, person_name)
+                Control.addpersonHistory("",person_name,fullname,timeCheckIn,timeCheckOut)
                 text = f"Hello{fullname}. Hope you have a good day."
                 engine.say(text)
                 engine.runAndWait()
@@ -112,49 +113,6 @@ while True:
         cv2.rectangle(frame, (x, y), (end_cord_x, end_cord_y), color, stroke)
     cv2.imshow("frame", frame)
 
-    # nếu là người quen
-    # Lấy đường dẫn tới thư mục chứa tệp Python đang chạy
-    # current_directory = os.path.dirname(os.path.abspath(__file__))
-    # img_directory = os.path.join(current_directory, "img")
-    # if not os.path.exists(img_directory):
-    #     os.makedirs(img_directory)
-    # if flag==1:
-    #     flag=0
-    #     #Create last photo into folder
-    #     img_item = (
-    #             os.path.join(img_directory, person_name)
-    #             + str(datetime.now().strftime("%Y%m%d%H%M%S"))
-    #             + ".png"
-    #     )
-    #     cv2.imwrite(img_item, frame)
-    # #add hoặc update history của người quen
-    #     imgURL = Control.getImageUrl("")
-    #     print(imgURL)
-
-        ############ Tải hết ảnh từ file img lên firebase ###############
-
-        ################
-    # Fname, Lname = Firebase.getNameById("",person_name)
-    #     print(person_name)
-    #     Control.addHistory("",imgURL, person_name, 0, True, True)
-
-    #trường hợp người lạ
-    # if flag==2:
-    #     flag=0
-    #     Control.addPerson("","undefined","undefined",)
-    #     img_item = (
-    #             os.path.join(img_directory, person_name)
-    #             + str(datetime.now().strftime("%Y%m%d%H%M%S"))
-    #             + ".png"
-    #     )
-    #     cv2.imwrite(img_item, frame)
-    #     # add hoặc update history của người quen
-    #     imgURL = Control.getImageUrl("")
-    #     print(imgURL)
-    #     # Fname, Lname = Firebase.getNameById("",person_name)
-    #     print(person_name)
-    #     Control.addHistory("", imgURL, person_name, 0, True, True)
-    # so sánh thời gian làm việc của người trong công ty
     if cv2.waitKey(20) & 0xFF == ord("q"):
         break
 cap.release()

@@ -11,7 +11,8 @@ cred = credentials.Certificate("serviceAccountKey.json")
 #     'databaseURL':"https://datkll-781f0-default-rtdb.firebaseio.com/"
 # })
 firebase_admin.initialize_app(cred,{
-     'databaseURL':"https://fir-c20cd-default-rtdb.asia-southeast1.firebasedatabase.app/"
+     'databaseURL':"https://fir-c20cd-default-rtdb.asia-southeast1.firebasedatabase.app/",
+'storageBucket':"fir-c20cd.appspot.com"
  })
 import os
 import glob
@@ -48,23 +49,6 @@ class Firebase:
     #     return Fname, Lname
 
 class Control:
-    # def addPerson(self,Fname,Lname,idstudent,village):
-    #     persons = db.reference('person')
-    #     # Lấy danh sách người từ Firebase
-    #     persons_data = persons.get()
-    #     # num_persons = len(persons_data) if persons_data else 0
-    #
-    #     # Tạo một bản ghi mới
-    #     newPerson = {
-    #         # "id": num_persons,
-    #         "Fname": Fname,
-    #         "Lname": Lname,
-    #         "MSSV": idstudent,
-    #         "Quequan": village,
-    #         "createAt": datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-    #     }
-    #     persons.child(str(idstudent)).set(newPerson)
-    #
     def addPerson(self,Name,idstudent,village):
         persons = db.reference('person')
         # Lấy danh sách người từ Firebase
@@ -73,32 +57,14 @@ class Control:
 
         # Tạo một bản ghi mới
         newPerson = {
-            # "id": num_persons,
             "Name": Name,
-            "Quequan": village,
+            "ID": idstudent,
+            "Hometown": village,
             "createAt": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
             "total_attendance":0,
             "attendance_processed": False
         }
         persons.child(idstudent).set(newPerson)
-
-    # def addHistory(self,imgUrl,Personid,__v,Status=True,Response=False):
-    #         history = db.reference('history')
-    #         timeEvent = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-    #
-    #         # Tạo một lượt mới
-    #         newTurn = {
-    #             "urlimg": imgUrl,
-    #             "Status": Status,
-    #             "Personid": Personid,
-    #             "updateAt": timeEvent,
-    #             "__v": __v,
-    #             "Response": Response
-    #         }
-    #         # Thêm lượt mới vào Firebase với Personid là tên của node con
-    #         history.child(str(Personid)).set(newTurn)
-    # def getIdStudentByFnameLame(self,idstudent):
-
 
     def addCheckin(self,Name,idstudent):
         checkin = db.reference('checkin')
@@ -108,6 +74,7 @@ class Control:
         newTurn = {
                 # "urlimg": imgUrl,
             "Name": Name,
+            "ID": idstudent,
             "checkinTime": timeEvent,
         }
         # Thêm lượt mới vào Firebase với Personid là tên của node con
@@ -121,21 +88,11 @@ class Control:
         newTurn = {
               # "urlimg": imgUrl,
             "Name": Name,
+            "ID": idstudent,
             "checkoutTime": timeEvent,
         }
             # Thêm lượt mới vào Firebase với Personid là tên của node con
         checkout.child(str(idstudent)).set(newTurn)
-
-    # def getIdbyName(self, name):
-    #     persons = db.reference('person')
-    #     persons_data = persons.get()
-    #
-    #     for idstudent, person_data in persons_data.items():
-    #         if person_data.get("Name") == name:
-    #             return idstudent
-    #
-    #     # Trường hợp không tìm thấy
-    #     return None
 
     def getNameById(self, given_id):
         persons_ref = db.reference('person')
@@ -175,14 +132,6 @@ class Control:
 
         # Trường hợp không tìm thấy ID
         return None
-    # def getTotalAttendance(self,id):
-    #     persons = db.reference("person")
-    #     person_data=persons.get()
-    #     for person_id, person_data in person_data.items():
-    #         # Kiểm tra nếu ID của người bằng với ID đã cho
-    #         if person_id == id:
-    #             # Trả về tên của người đó
-    #             person_data.get("total_attendance")+=1
 
     def compareTime(self,time_str1,time_str2,id):
 
@@ -218,8 +167,22 @@ class Control:
         temp['attendance_processed'] = False
         temp_ref.update({'attendance_processed': temp['attendance_processed']})
 
-
-
+    def addpersonHistory(self,idstudent,name,checkInTime,checkOutTime):
+        history = db.reference('history')
+        day_ref = db.reference("/history/" + idstudent + "/day")
+        current_date = datetime.now()
+        day = current_date.day
+        month = current_date.month
+        year = current_date.year
+        formatted_date = str(day) + '-' + str(month) + '-' + str(year)
+        newTurn = {
+              # "urlimg": imgUrl,
+            "Name": name,
+            "ID": idstudent,
+            "checkInTime": checkInTime,
+            "checkOutTime": checkOutTime
+        }
+        history.child(str(idstudent)).child(formatted_date).set(newTurn)
 
 
 
