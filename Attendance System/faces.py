@@ -5,11 +5,8 @@ import pickle
 from addDataToDatabase import Control
 import pyttsx3
 import numpy as np
-# from datetime import datetime
-# from addDataToDatabase import Firebase
 face_cascade = cv2.CascadeClassifier("./cascades/data/haarcascade_frontalface_alt2.xml")
-# import os
-# import requests
+
 
 
 #khởi tạo speakerqqqqq
@@ -27,8 +24,8 @@ cap = cv2.VideoCapture(0)
 
 # Rescale frame
 def make_720p():
-    cap.set(3, 1280)
-    cap.set(4, 720)
+    cap.set(3, 640)
+    cap.set(4, 480)
 
 count_stranger = 30
 count_relative = 20

@@ -9,6 +9,7 @@ from addDataToDatabase import Firebase
 from firebase_admin import storage,credentials
 import addDataToDatabase
 
+
 def newPerson():
     # Fname = str(input("Type your first name: "))
     # Lname = str(input("Type your last name: "))
@@ -28,6 +29,10 @@ def storeUserImage():
         "./cascades/data/haarcascade_frontalface_alt.xml"
     )
     video = cv2.VideoCapture(0)
+    # Set the camera resolution
+    video.set(3, 640)  # Width
+    video.set(4, 480)  # Height
+
     count = 0
     count_shot = 10
     while True:

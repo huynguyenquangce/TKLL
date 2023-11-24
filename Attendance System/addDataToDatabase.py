@@ -155,7 +155,7 @@ class Control:
         #     temp['total_attendance'] += 1
         #     # Cập nhật giá trị trong cơ sở dữ liệu
         #     temp_ref.update({'total_attendance': temp['total_attendance']})
-        if hours == 0 and minutes == 0 and seconds >= 15 and not temp.get('attendance_processed', False):
+        if hours == 0 and minutes == 0 and seconds >= 5 and not temp.get('attendance_processed', False):
             temp['total_attendance'] += 1
             temp['attendance_processed'] = True  # Đặt biến flag thành True để đánh dấu là đã xử lý
             # Cập nhật giá trị trong cơ sở dữ liệu
