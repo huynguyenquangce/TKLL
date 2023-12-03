@@ -50,7 +50,7 @@ def storeUserImage():
         key = cv2.waitKey(1)
 
         # Press 'q' to exit
-        if key == ord("q") or count == 30:
+        if key == ord("q") or count == 3:
             break
     print("added!")
     # add first image for data

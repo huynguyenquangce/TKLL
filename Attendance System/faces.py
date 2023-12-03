@@ -9,7 +9,7 @@ face_cascade = cv2.CascadeClassifier("./cascades/data/haarcascade_frontalface_al
 
 
 
-#khởi tạo speakerqqqqq
+#khởi tạo speaker
 engine = pyttsx3.init()
 
 recognizer = cv2.face.LBPHFaceRecognizer_create()
@@ -22,7 +22,7 @@ with open("labels.pickle", "rb") as f:
 
 cap = cv2.VideoCapture(0)
 
-# Rescale frame
+# Rescale frameq
 def make_720p():
     cap.set(3, 640)
     cap.set(4, 480)
@@ -90,8 +90,6 @@ while True:
             stroke = 2
             cv2.putText(frame, name, (x, y), font, 1, color, stroke, cv2.LINE_AA)
             #speaker
-
-
             count_stranger = count_stranger - 1
             if count_stranger == 0:
                 print("Who are you??")
