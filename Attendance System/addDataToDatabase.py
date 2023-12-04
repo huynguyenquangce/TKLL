@@ -49,7 +49,7 @@ class Firebase:
     #     return Fname, Lname
 
 class Control:
-    def addPerson(self,Name,idstudent,village):
+    def addPerson(self,Name,idstudent,village,position):
         persons = db.reference('person')
         # Lấy danh sách người từ Firebase
         persons_data = persons.get()
@@ -60,6 +60,7 @@ class Control:
             "Name": Name,
             "ID": idstudent,
             "Hometown": village,
+            "Position":position,
             "createAt": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
             "total_attendance":0,
             "attendance_processed": False

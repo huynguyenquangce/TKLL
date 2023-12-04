@@ -16,8 +16,9 @@ def newPerson():
     Name = str(input("Type your name here: "))
     idstudent = str(input("Type your student id: "))
     village = str(input("Type your hometown here: "))
+    position = str(input("Type your position here: "))
     # Control.addPerson("", Fname, Lname,idstudent,village)
-    Control.addPerson("", Name, idstudent, village)
+    Control.addPerson("", Name, idstudent, village, position)
     os.makedirs("./images/" + str(idstudent))
     return "Adding {} to dataset".format(Name), idstudent
 
@@ -50,7 +51,7 @@ def storeUserImage():
         key = cv2.waitKey(1)
 
         # Press 'q' to exit
-        if key == ord("q") or count == 3:
+        if key == ord("q") or count == 10:
             break
     print("added!")
     # add first image for data
