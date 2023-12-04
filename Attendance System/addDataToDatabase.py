@@ -4,15 +4,10 @@ from firebase_admin import db
 from firebase_admin import storage
 from datetime import datetime
 cred = credentials.Certificate("serviceAccountKey.json")
-# firebase_admin.initialize_app(cred,{
-#     'databaseURL':"https://faceattendancerealtime-8bc2f-default-rtdb.firebaseio.com/"
-# })
-# firebase_admin.initialize_app(cred,{
-#     'databaseURL':"https://datkll-781f0-default-rtdb.firebaseio.com/"
-# })
+
 firebase_admin.initialize_app(cred,{
-     'databaseURL':"https://fir-c20cd-default-rtdb.asia-southeast1.firebasedatabase.app/",
-'storageBucket':"fir-c20cd.appspot.com"
+     'databaseURL':"https://rawda-7ee0e-default-rtdb.firebaseio.com/",
+'storageBucket':"rawda-7ee0e.appspot.com"
  })
 import os
 import glob
