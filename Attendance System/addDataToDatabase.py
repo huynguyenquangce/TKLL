@@ -4,10 +4,15 @@ from firebase_admin import db
 from firebase_admin import storage
 from datetime import datetime
 cred = credentials.Certificate("serviceAccountKey.json")
-
+# firebase_admin.initialize_app(cred,{
+#     'databaseURL':"https://faceattendancerealtime-8bc2f-default-rtdb.firebaseio.com/"
+# })
+# firebase_admin.initialize_app(cred,{
+#     'databaseURL':"https://datkll-781f0-default-rtdb.firebaseio.com/"
+# })
 firebase_admin.initialize_app(cred,{
-     'databaseURL':"https://rawda-7ee0e-default-rtdb.firebaseio.com/",
-'storageBucket':"rawda-7ee0e.appspot.com"
+     'databaseURL':"https://fir-c20cd-default-rtdb.asia-southeast1.firebasedatabase.app/",
+'storageBucket':"fir-c20cd.appspot.com"
  })
 import os
 import glob
@@ -163,6 +168,23 @@ class Control:
         temp['attendance_processed'] = False
         temp_ref.update({'attendance_processed': temp['attendance_processed']})
 
+    # def addpersonHistory(self,idstudent,name,checkInTime,checkOutTime):
+    #     history = db.reference('history')
+    #     day_ref = db.reference("/history/" + idstudent + "/day")
+    #     current_date = datetime.now()
+    #     day = current_date.day
+    #     month = current_date.month
+    #     year = current_date.year
+    #     formatted_date = str(day) + '-' + str(month) + '-' + str(year)
+    #     newTurn = {
+    #           # "urlimg": imgUrl,
+    #         "Name": name,
+    #         "ID": idstudent,
+    #         "checkInTime": checkInTime,
+    #         "checkOutTime": checkOutTime
+    #     }
+    #     history.child(str(idstudent)).child(formatted_date).set(newTurn)
+
     def addpersonHistory(self,idstudent,name,checkInTime,checkOutTime):
         history = db.reference('history')
         day_ref = db.reference("/history/" + idstudent + "/day")
@@ -178,10 +200,21 @@ class Control:
             "checkInTime": checkInTime,
             "checkOutTime": checkOutTime
         }
-        history.child(str(idstudent)).child(formatted_date).set(newTurn)
+        history.child(str(formatted_date)).child(idstudent).set(newTurn)
 
+    def addUrlImg(self,download_url,idstudent):
+        persons = db.reference('person')
+        newURL = {
+            "imgURL":download_url
+        }
+        persons.child(idstudent).set(newURL)
 
+    def add_field_to_person(self,idstudent,field_name,field_value):
+        # Tham chiếu đến nút cụ thể trong Database
+        ref = db.reference(f'person/{idstudent}')
 
+        # Thêm trường dữ liệu mới
+        ref.update({field_name: field_value})
 
 
 

@@ -51,29 +51,36 @@ def storeUserImage():
         key = cv2.waitKey(1)
 
         # Press 'q' to exit
-        if key == ord("q") or count == 7:
+        if key == ord("q") or count == 10:
             break
     print("added!")
-    # # add first image for data
-    # # path to user_capture
-    # folder_path = f"images/{idstudent}"
-    # # Lấy danh sách các tệp tin trong thư mục
-    # file_list = os.listdir(folder_path)
-    # if file_list:
-    #     first_image_path = os.path.join(folder_path, file_list[0])
-    #
-    #     # Upload ảnh lên Firebase Storage
-    #     bucket = storage.bucket()
-    #     image_blob = bucket.blob(f"images/{idstudent}/{file_list[0]}")
-    #     image_blob.upload_from_filename(first_image_path)
-    #     # Lấy URL của ảnh sau khi upload
-    #     download_url = image_blob.public_url
-    #
-    #     print("First image uploaded. File available at", download_url)
-    # else:
-    #     print("No images found in the specified folder.")
+
+    # add first image for data
+    # path to user_capture
+    folder_path = f"images/{idstudent}"
+    # Lấy danh sách các tệp tin trong thư mục
+    file_list = os.listdir(folder_path)
+    if file_list:
+        first_image_path = os.path.join(folder_path, file_list[0])
+
+        # Upload ảnh lên Firebase Storage
+        bucket = storage.bucket()
+        image_blob = bucket.blob(f"images/{idstudent}/{file_list[0]}")
+        image_blob.upload_from_filename(first_image_path)
+        # Lấy URL của ảnh sau khi upload
+        download_url = image_blob.public_url
+        # url = image_blob.generate_signed_url(expiration=3600)  # Hết hạn sau 1 giờ, bạn có thể điều chỉnh giá trị này
+
+        # Update thêm link URL vào bộ dữ liệu
+        Control.add_field_to_person("",idstudent,"URL",download_url)
+        # Control.addUrlImg("",download_url,idstudent)
+        print("First image uploaded. File available at", download_url)
+    else:
+        print("No images found in the specified folder.")
     #####################
     # Release memory
     video.release()
+
+
 storeUserImage()
 cv2.destroyAllWindows()
