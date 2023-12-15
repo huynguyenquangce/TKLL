@@ -2,14 +2,8 @@ import firebase_admin
 from firebase_admin import credentials
 from firebase_admin import db
 from firebase_admin import storage
-from datetime import datetime
+from datetime import datetime,time,timedelta
 cred = credentials.Certificate("serviceAccountKey.json")
-# firebase_admin.initialize_app(cred,{
-#     'databaseURL':"https://faceattendancerealtime-8bc2f-default-rtdb.firebaseio.com/"
-# })
-# firebase_admin.initialize_app(cred,{
-#     'databaseURL':"https://datkll-781f0-default-rtdb.firebaseio.com/"
-# })
 firebase_admin.initialize_app(cred,{
      'databaseURL':"https://fir-c20cd-default-rtdb.asia-southeast1.firebasedatabase.app/",
 'storageBucket':"fir-c20cd.appspot.com"
@@ -18,8 +12,14 @@ import os
 import glob
 
 # bucket = storage.bucket()
+# xử lí thời gian làm việc của công ty
 image_directory= "img/"
-
+checkIn_request = time(2, 16, 0)
+checkOut_request = time(2, 17, 5)
+time_difference = timedelta(hours=checkOut_request.hour - checkIn_request.hour,
+                            minutes=checkOut_request.minute - checkIn_request.minute,
+                            seconds=checkOut_request.second - checkIn_request.second)
+request_time = time_difference.total_seconds()*1000
 class Firebase:
     # def updateFlag(self):
     #     flag = db.reference('flags')
@@ -35,18 +35,6 @@ class Firebase:
         persons.delete()
         return "Delete all persons"
 
-    # def getNameById(self, id):
-    #     persons = db.reference('persons')
-    #     # Sử dụng get() để lấy dữ liệu của "persons"
-    #     persons_data = persons.get()
-    #     Fname, Lname = "", ""
-    #     if persons_data is not None:
-    #         for person_info in persons_data:
-    #             if person_info.get('id') == id:
-    #                 Fname = person_info.get('Fname', '')
-    #                 Lname = person_info.get('Lname', '')
-    #                 break
-    #     return Fname, Lname
 
 class Control:
     def addPerson(self,Name,idstudent,village,position):
@@ -134,33 +122,40 @@ class Control:
         # Trường hợp không tìm thấy ID
         return None
 
-    def compareTime(self,time_str1,time_str2,id):
+    # def compareTime(self,time_str1,time_str2,id):
+    #     temp_ref = db.reference(f'person/{id}')
+    #     temp = temp_ref.get()
+    #     time1 = datetime.strptime(time_str1, "%Y-%m-%d %H:%M:%S")
+    #     time2 = datetime.strptime(time_str2, "%Y-%m-%d %H:%M:%S")
+    #     # test //////////////////////////////////////////////////////////////////////////////////
+    #
+    #
+    #     # Ví dụ: Đối tượng checkOuttime
+    #     time_str2 = datetime.now()
+    #     # Giờ checkOut quy định
+    #     attendance_checkOutTime = time_str2.replace(hour=20, minute=12, second=0, microsecond=0)
+    #     time_differenceCO = time1 - attendance_checkOutTime
+    #     #test //////////////////////////////////////////////////////////////////////////////////////
+    #
+    #     # Thực hiện phép trừ
+    #     # time_difference = time1 - time2
+    #
+    #     # Lấy tổng số giây chênh lệch
+    #     total_seconds2 = time_differenceCO.total_seconds()
+    #
+    #     # Tách giờ, phút và giây từ tổng số giây chênh lệch
+    #     hours2, remainder = divmod(total_seconds2, 3600)
+    #     minutes2, seconds2 = divmod(remainder, 60)
 
-        temp_ref = db.reference(f'person/{id}')
-        temp = temp_ref.get()
-        time1 = datetime.strptime(time_str1, "%Y-%m-%d %H:%M:%S")
-        time2 = datetime.strptime(time_str2, "%Y-%m-%d %H:%M:%S")
+# # CheckOut
+#         # print(f"{hours} giờ, {minutes} phút, {seconds} giây")
+#         if hours2 >= 0 and minutes2 >= 0 and seconds2 >= 0 and not temp.get('attendance_processed', False):
+#             temp['total_attendance'] += 1
+#             temp['attendance_processed'] = True  # Đặt biến flag thành True để đánh dấu là đã xử lý
+#             # Cập nhật giá trị trong cơ sở dữ liệu
+#             temp_ref.update({'total_attendance': temp['total_attendance'], 'attendance_processed': True})
 
-        # Thực hiện phép trừ
-        time_difference = time1 - time2
 
-        # Lấy tổng số giây chênh lệch
-        total_seconds = time_difference.total_seconds()
-
-        # Tách giờ, phút và giây từ tổng số giây chênh lệch
-        hours, remainder = divmod(total_seconds, 3600)
-        minutes, seconds = divmod(remainder, 60)
-
-        print(f"{hours} giờ, {minutes} phút, {seconds} giây")
-        # if (hours == 0 and minutes ==0 and seconds >= 30):
-        #     temp['total_attendance'] += 1
-        #     # Cập nhật giá trị trong cơ sở dữ liệu
-        #     temp_ref.update({'total_attendance': temp['total_attendance']})
-        if hours == 0 and minutes == 0 and seconds >= 5 and not temp.get('attendance_processed', False):
-            temp['total_attendance'] += 1
-            temp['attendance_processed'] = True  # Đặt biến flag thành True để đánh dấu là đã xử lý
-            # Cập nhật giá trị trong cơ sở dữ liệu
-            temp_ref.update({'total_attendance': temp['total_attendance'], 'attendance_processed': True})
 
     def resetCheck(self,id):
         temp_ref = db.reference(f'person/{id}')
@@ -168,22 +163,6 @@ class Control:
         temp['attendance_processed'] = False
         temp_ref.update({'attendance_processed': temp['attendance_processed']})
 
-    # def addpersonHistory(self,idstudent,name,checkInTime,checkOutTime):
-    #     history = db.reference('history')
-    #     day_ref = db.reference("/history/" + idstudent + "/day")
-    #     current_date = datetime.now()
-    #     day = current_date.day
-    #     month = current_date.month
-    #     year = current_date.year
-    #     formatted_date = str(day) + '-' + str(month) + '-' + str(year)
-    #     newTurn = {
-    #           # "urlimg": imgUrl,
-    #         "Name": name,
-    #         "ID": idstudent,
-    #         "checkInTime": checkInTime,
-    #         "checkOutTime": checkOutTime
-    #     }
-    #     history.child(str(idstudent)).child(formatted_date).set(newTurn)
 
     def addpersonHistory(self,idstudent,name,checkInTime,checkOutTime):
         history = db.reference('history')
@@ -193,12 +172,26 @@ class Control:
         month = current_date.month
         year = current_date.year
         formatted_date = str(day) + '-' + str(month) + '-' + str(year)
+
+        # # Ví dụ: Đối tượng checkIntime
+        # time_str1 = datetime.now()
+        #
+        # # Giờ checkIn quy định
+        # attendance_checkInTime = time_str1.replace(hour=10, minute=12, second=0, microsecond=0)
+        # compare_checkIn = checkInTime - attendance_checkInTime
+        checkInTime_temp = datetime.strptime(checkInTime, "%Y-%m-%d %H:%M:%S")
+        checkOutTime_temp = datetime.strptime(checkOutTime, "%Y-%m-%d %H:%M:%S")
+        isLate = checkInTime_temp.time() > checkIn_request
+        isSooner = checkOutTime_temp.time() < checkOut_request
         newTurn = {
               # "urlimg": imgUrl,
+            "isLate" : isLate,
+            "isSooner": isSooner,
             "Name": name,
             "ID": idstudent,
             "checkInTime": checkInTime,
-            "checkOutTime": checkOutTime
+            "checkOutTime": checkOutTime,
+            "request_time": request_time
         }
         history.child(str(formatted_date)).child(idstudent).set(newTurn)
 

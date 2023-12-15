@@ -7,8 +7,6 @@ import pyttsx3
 import numpy as np
 face_cascade = cv2.CascadeClassifier("./cascades/data/haarcascade_frontalface_alt2.xml")
 
-
-
 #khởi tạo speaker
 engine = pyttsx3.init()
 
@@ -76,7 +74,7 @@ while True:
                 # getTime checkIn + checkOut and compare
                 timeCheckIn = Control.getTimeCheckIn("", person_name)
                 timeCheckOut = Control.getTimeCheckOut("", person_name)
-                Control.compareTime("", timeCheckOut, timeCheckIn, person_name)
+                # Control.compareTime("", timeCheckOut, timeCheckIn, person_name)
                 Control.addpersonHistory("",person_name,fullname,timeCheckIn,timeCheckOut)
                 text = f"Hello{fullname}. Hope you have a good day."
                 engine.say(text)
